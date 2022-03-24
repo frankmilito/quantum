@@ -1,4 +1,5 @@
-import {useState} from "react"
+import {useState, useEffect} from "react"
+import CustomSelect from "./components/CustomSelect"
 import DetailCard from "./components/DetailCard"
 import Header from "./components/Header"
 import SummaryCard from "./components/SummaryCard"
@@ -8,9 +9,13 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("")
   const [weatherData, setWeatherData] = useState([])
   const [city, setCity] = useState("Unknown Location")
+  const [states, setStates] = useState([])
+  const [countryData, setCountryData] = useState([])
+  const [cities, setCities] = useState([])
   const [weatherIcon, setWeatherIcon] = useState(
     `${process.env.REACT_APP_ICON}10n@2x.png`
   )
+  const [countries, setCountries] = useState([])
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = e => {
@@ -20,6 +25,10 @@ function App() {
   const handleChange = e => {
     setSearchTerm(e.target.value)
   }
+  useEffect(() => {
+    getCountries()
+  }, [])
+
   const getWeather = async location => {
     setLoading(true)
     setWeatherData([])
@@ -27,13 +36,13 @@ function App() {
     let searchParams =
       typeof location === "string"
         ? `q=${location}`
-        : `lat=${location[0]}$lon=${location[1]} `
+        : `lat=${location.latitude}$lon=${location.longitude} `
 
     try {
       let res = await fetch(
         `${
           process.env.REACT_APP_URL + searchParams
-        }&appid=${API_KEY}&units=metric&cnt=5&exclude=hourly,minutely`
+        }&appid=${API_KEY}&units=metric&cnt=5&exclude=hourly,minutely&date=1527811200`
       )
       let data = await res.json()
       console.log(data.cod)
@@ -54,7 +63,43 @@ function App() {
   }
   const myIP = location => {
     const {latitude, longitude} = location.coords
-    getWeather(latitude, longitude)
+    console.log(latitude, longitude)
+    getWeather({latitude, longitude})
+  }
+
+  const getCountries = async () => {
+    let res = await fetch(
+      "https://pkgstore.datahub.io/core/world-cities/world-cities_json/data/5b3dd46ad10990bca47b04b4739a02ba/world-cities_json.json"
+    )
+    const data = await res.json()
+    setCountryData(data)
+    const countries = [...new Set(data.map(item => item.country))]
+    countries.sort()
+    setCountries(countries)
+  }
+
+  const handleCountryChange = e => {
+    let states = countryData.filter(
+      country => country.country === e.target.value
+    )
+    states = [...new Set(states.map(item => item.subcountry))]
+    states.sort()
+    setStates(states)
+  }
+
+  const handleStateChange = e => {
+    let cities = countryData.filter(city => city.subcountry === e.target.value)
+    console.log(cities)
+    cities = cities.map(city => city.name)
+    console.log(cities)
+    cities.sort()
+    setCities(cities)
+  }
+
+  const handleDateChange = e => {
+    const date = new Date(e.target.value)
+
+    console.log(date.toUTCString())
   }
   return (
     <div className="bg-grey-800 flex items-center w-screen h-screen py-10">
@@ -77,8 +122,95 @@ function App() {
             <form
               noValidate
               onSubmit={handleSubmit}
-              className="flex justify-center w-full"
+              className=" justify-center w-full"
             >
+              <div class="w-full  px-3 mb-6 md:mb-0">
+                <label
+                  class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                  for="grid-state"
+                >
+                  Country
+                </label>
+                <div class="relative">
+                  <select
+                    class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    id="grid-state"
+                    onChange={handleCountryChange}
+                  >
+                    <>
+                      <option>Select Country</option>
+                      {countries.map(country => (
+                        <option key={country} value={country}>
+                          {country}
+                        </option>
+                      ))}
+                    </>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg
+                      class="fill-current h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="w-full  px-3 mb-6 md:mb-0">
+                <label
+                  class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                  for="grid-state"
+                >
+                  States
+                </label>
+                <div class="relative">
+                  <select
+                    class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    id="grid-state"
+                    onChange={handleStateChange}
+                    disabled={!states.length}
+                  >
+                    <>
+                      <option>Select State</option>
+                      {states.map(state => (
+                        <option key={state} value={state}>
+                          {state}
+                        </option>
+                      ))}
+                    </>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg
+                      class="fill-current h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <CustomSelect
+                title="City"
+                onChange={null}
+                disabled={!cities.length}
+                data={cities}
+              />
+              <div class="flex items-center justify-center">
+                <label for="floatingInput" class="text-gray-700">
+                  Select a date
+                </label>
+                <br />
+                <div class="datepicker relative form-floating mb-3 xl:w-96">
+                  <input
+                    type="datetime-local"
+                    class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                    placeholder="Select a date"
+                    onChange={handleDateChange}
+                  />
+                </div>
+              </div>
               <input
                 type="text"
                 placeholder="Enter location"
