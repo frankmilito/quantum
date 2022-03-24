@@ -1,5 +1,7 @@
 import {useState} from "react"
+import DetailCard from "./components/DetailCard"
 import Header from "./components/Header"
+import SummaryCard from "./components/SummaryCard"
 function App() {
   const API_KEY = process.env.REACT_API_KEY
   const [nodata, setNodata] = useState("No data yet")
