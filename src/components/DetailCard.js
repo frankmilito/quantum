@@ -15,7 +15,7 @@ const DetailCard = ({weather_icon, data}) => {
       <div className="my-auto">
         <p
           onClick={() => setCelsius(!celsius)}
-          className="font-bold text-5xl text-pink-800 mb-2"
+          className="font-bold text-5xl text-pink-800 mb-2 cursor-pointer"
         >
           {convertTemp(main.temp)}
         </p>
