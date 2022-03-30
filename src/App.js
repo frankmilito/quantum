@@ -36,13 +36,13 @@ function App() {
     let searchParams =
       typeof location === "string"
         ? `q=${location}`
-        : `lat=${location.latitude}$lon=${location.longitude} `
+        : `lat=${location.latitude}&lon=${location.longitude} `
 
     try {
       let res = await fetch(
         `${
           process.env.REACT_APP_URL + searchParams
-        }&appid=${API_KEY}&units=metric&cnt=5&exclude=hourly,minutely&date=1527811200`
+        }&appid=${API_KEY}&units=metric&cnt=5&exclude=hourly,minutely&`
       )
       let data = await res.json()
       console.log(data.cod)
@@ -62,8 +62,9 @@ function App() {
     }
   }
   const myIP = location => {
-    const {latitude, longitude} = location.coords
-    console.log(latitude, longitude)
+    let {latitude, longitude} = location.coords
+    latitude = latitude.toFixed(2)
+    longitude = longitude.toFixed(2)
     getWeather({latitude, longitude})
   }
 
@@ -79,6 +80,7 @@ function App() {
   }
 
   const handleCountryChange = e => {
+    getWeather(e.target.value)
     let states = countryData.filter(
       country => country.country === e.target.value
     )
@@ -88,25 +90,23 @@ function App() {
   }
 
   const handleStateChange = e => {
+    getWeather(e.target.value)
     let cities = countryData.filter(city => city.subcountry === e.target.value)
-    console.log(cities)
     cities = cities.map(city => city.name)
-    console.log(cities)
     cities.sort()
     setCities(cities)
   }
 
-  const handleDateChange = e => {
-    const date = new Date(e.target.value)
-
-    console.log(date.toUTCString())
+  const handleCityChange = e => {
+    getWeather(e.target.value)
   }
+
   return (
-    <div className="bg-grey-800 flex items-center w-screen h-screen py-10">
-      <div className="flex w-3/4 min-h-full rounded-3xl shadow-lg m-auto bg-gray-100">
+    <div className="bg-grey-800 flex  items-center w-screen h-screen py-10">
+      <div className="md:flex w-3/4  min-h-full rounded-3xl shadow-lg m-auto bg-gray-100">
         <div className="form-container">
           <div className="flex items-center justify-center">
-            <h3 className="my-auto mr-auto text-xl text-pink-800 font-bold shadow-md py-1 px-3 rounded--md bg-white bg-opacity-30">
+            <h3 className="my-auto mr-auto text-xl text-pink-800 font-bold shadow-md py-1 px-3 rounded--md bg-white bg-white">
               Forcast
             </h3>
             <div className="flex p-2 text-gray-100 bg-gray-600 bg-opacity-30 rounded-lg">
@@ -124,9 +124,9 @@ function App() {
               onSubmit={handleSubmit}
               className=" justify-center w-full"
             >
-              <div class="w-full  px-3 mb-6 md:mb-0">
+              <div class="w-full  px-3 mb-6 md:mb-2">
                 <label
-                  class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+                  class="block uppercase tracking-wide text-white text-xs font-bold mb-1"
                   for="grid-state"
                 >
                   Country
@@ -157,7 +157,7 @@ function App() {
                   </div>
                 </div>
               </div>
-              <div class="w-full  px-3 mb-6 md:mb-0">
+              <div class="w-full  px-3 mb-6 md:mb-1">
                 <label
                   class="block uppercase tracking-wide text-white text-xs font-bold mb-2"
                   for="grid-state"
@@ -193,45 +193,31 @@ function App() {
               </div>
               <CustomSelect
                 title="City"
-                onChange={null}
+                onChange={handleCityChange}
                 disabled={!cities.length}
                 data={cities}
               />
-              <div class="flex items-center justify-center">
-                <label for="floatingInput" class="text-gray-700">
-                  Select a date
-                </label>
-                <br />
-                <div class="datepicker relative form-floating mb-3 xl:w-96">
-                  <input
-                    type="datetime-local"
-                    class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                    placeholder="Select a date"
-                    onChange={handleDateChange}
-                  />
+              <div class="flex justify-center">
+                <div class="mb-3 w-full  px-3 mb-6 md:mb-0">
+                  <div class="input-group relative flex flex-wrap items-stretch w-full mb-4 mt-5">
+                    <input
+                      type="search"
+                      className="bg-gray-200 border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none w-5/6"
+                      placeholder="Search for location"
+                      aria-label="Search"
+                      aria-describedby="button-addon3"
+                      onChange={handleChange}
+                    />
+                    <i
+                      className="fa fa-map-marker-alt my-auto cursor-pointer p-3 text-white"
+                      aria-hidden="true"
+                      onClick={() => {
+                        navigator.geolocation.getCurrentPosition(myIP)
+                      }}
+                    ></i>
+                  </div>
                 </div>
               </div>
-              <input
-                type="text"
-                placeholder="Enter location"
-                className="relative rounded-xl py-2 px-3 w-2/3 bg-gray-300 bg-opacity-60 text-white placeholder-gray-200"
-                onChange={handleChange}
-                required
-              />
-              <button type="submit" className="z-10">
-                <i
-                  className="fa fa-search text-white -ml-10 border-l my-auto z-10 cursor-pointer p-3"
-                  aria-hidden="true"
-                  type="submit"
-                ></i>
-              </button>
-              <i
-                className="fa fa-map-marker-alt my-auto cursor-pointer p-3 text-white"
-                aria-hidden="true"
-                onClick={() => {
-                  navigator.geolocation.getCurrentPosition(myIP)
-                }}
-              ></i>
             </form>
           </div>
         </div>

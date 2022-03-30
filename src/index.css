@@ -14,7 +14,8 @@ h1 {
 }
 
 .form-container {
-  background: url("./assests/sea.jpeg");
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("./assests/sea.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 40% 50%;
@@ -31,4 +32,10 @@ h1 {
   margin-left: 2px;
   margin-top: -3px;
   @apply animate-ping bg-pink-800;
+}
+
+@media only screen and (max-width: 600px) {
+  .form-container {
+    @apply w-full;
+  }
 }
