@@ -219,7 +219,7 @@ const MainComponent = () => {
             </form>
           </div>
         </div>
-        <div className="w-2/4 p-5">
+        <div className="  p-5 xs:w-full md:w-2/4">
           {/* <Header /> */}
           {loading ? (
             "Loading..."
@@ -233,7 +233,7 @@ const MainComponent = () => {
                 </div>
               ) : (
                 <>
-                  <h1 className="text-5xl text-grey-800 mt-auto mb-4">Today</h1>
+                  <h1 className="text-4xl text-grey-800 mt-auto mb-4">Today</h1>
                   <DetailCard weather_icon={weatherIcon} data={weatherData} />
                   <h1 className="text-3xl text-grey-600 mb-4 mt-10">
                     More on {city}
