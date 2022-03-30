@@ -13,10 +13,13 @@ const DetailCard = ({weather_icon, data}) => {
   return (
     <div className="container p-4 flex items-center shadow-lg rounded-lg bg-white h-1/3 mb-auto">
       <div className="my-auto">
-        <p
+        <button
           onClick={() => setCelsius(!celsius)}
-          className="font-bold text-5xl text-pink-800 mb-2 cursor-pointer"
+          class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-4 rounded mb-2"
         >
+          Show {celsius ? "Fahrenheit" : "Celsius"}
+        </button>
+        <p className="font-bold text-5xl text-pink-800 mb-2 cursor-pointer">
           {convertTemp(main.temp)}
         </p>
         <p className="text-4xl text-grey-800 tracking-widest">
